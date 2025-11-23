@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import SocialLogin from "./SocialLogin";
 
 const LoginForm = () => {
   const [show, setShow] = useState(false);
@@ -101,6 +102,7 @@ const LoginForm = () => {
             Create a Account Now!
           </Link>
         </p>
+        <SocialLogin />
       </div>
     </div>
   );

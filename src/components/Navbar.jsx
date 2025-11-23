@@ -1,4 +1,5 @@
 "use client";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -7,6 +8,7 @@ import { FaSearch, FaShoppingBag } from "react-icons/fa";
 
 const Navbar = () => {
   const pathname = usePathname();
+  const session = useSession();
 
   const navItems = [
     { name: "Home", path: "/" },
@@ -73,11 +75,35 @@ const Navbar = () => {
       </div>
 
       <div className="navbar-end gap-x-5">
-        <div className="flex items-center cursor-pointer gap-x-5">
-          <FaShoppingBag size={26} />
-          <FaSearch size={26} />
-        </div>
-
+        {session?.data?.user ? (
+          <>
+            <div className="flex items-center cursor-pointer gap-x-5">
+              <FaShoppingBag size={26} />
+              <FaSearch size={26} />
+            </div>
+            {session?.data?.user.image && (
+              <Image
+                width={36}
+                height={24}
+                className="rounded-full"
+                src={session?.data?.user.image}
+                alt="profile user"
+              />
+            )}
+            <button onClick={() => signOut()} className="btn btn-warning">
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <Link className="btn btn-info" href={"/login"}>
+              Login
+            </Link>
+            <Link className="btn btn-outline" href={"/register"}>
+              Register
+            </Link>
+          </>
+        )}
         <Link href={"/appointment"} className="btn btn-outline">
           Appointment
         </Link>

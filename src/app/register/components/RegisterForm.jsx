@@ -5,6 +5,7 @@ import { Eye, EyeOff } from "lucide-react";
 import register from "@/app/actions/auth/register";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import SocialLogin from "@/app/login/components/SocialLogin";
 
 const RegisterForm = () => {
   const router = useRouter();
@@ -124,6 +125,7 @@ const RegisterForm = () => {
             Login
           </Link>
         </p>
+        <SocialLogin />
       </div>
     </div>
   );
