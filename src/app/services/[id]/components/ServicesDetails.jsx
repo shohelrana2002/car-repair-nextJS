@@ -9,6 +9,7 @@ const ServicesDetails = async ({ params }) => {
 
   return (
     <div>
+      <div></div>
       <div>
         <Image src={data?.img} width={752} height={400} alt={data?.title} />
         <p>{data?.title}</p>
