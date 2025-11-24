@@ -1,12 +1,13 @@
 "use client";
-
 import React, { useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import { User, Mail, MapPin, Phone, Flag, Home, Database } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { CiMoneyBill } from "react-icons/ci";
+import { useRouter } from "next/navigation";
 
-export default function CheckoutForm({ data }) {
+export default function BookingUpdateForm({ data }) {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const session = useSession();
   const { name, email } = session?.data?.user || [];
@@ -14,29 +15,20 @@ export default function CheckoutForm({ data }) {
     e.preventDefault();
     const form = e.target;
     const checkoutData = {
-      name: form.name.value,
-      email: form.email.value,
-      phone: form.phone.value,
       postal: form.postal.value,
       address: form.address.value,
       city: form.city.value,
-      country: form.country.value,
       delivery: form.delivery.value,
-      price: form.price.value,
       date: form.date.value,
-      //   data
-      service_id: data?._id,
-      title: data?.title,
-      image: data?.img,
-      services_price: data?.price,
+      phone: form.phone.value,
       crete_at: new Date().toISOString(),
     };
 
     setLoading(true);
-
+    const id = data?._id;
     try {
-      const res = await fetch("http://localhost:3000/api/services", {
-        method: "POST",
+      const res = await fetch(`http://localhost:3000/api/my-booking/${id}`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
@@ -44,8 +36,9 @@ export default function CheckoutForm({ data }) {
       });
       const data = await res.json();
       console.log(data);
-      if (data?.acknowledged > 0) {
-        toast.success("Order placed — thank you!");
+      if (data?.modifiedCount > 0) {
+        router.push("/my-bookings");
+        toast.success("Updated successfully");
         form.reset();
       }
     } catch (err) {
@@ -63,9 +56,9 @@ export default function CheckoutForm({ data }) {
         {/* Header */}
         <div className="text-center mb-6">
           <h3 className="text-3xl font-bold text-gray-800">
-            Checkout – {data?.title}
+            Updated Form – {data?.title}
           </h3>
-          <p className="text-gray-500">Complete your information below</p>
+          <p className="text-gray-500">Update your information below</p>
         </div>
 
         {/* Form */}
@@ -97,7 +90,7 @@ export default function CheckoutForm({ data }) {
             <label className="flex items-center gap-2 bg-gray-100 p-3 rounded-lg border">
               <CiMoneyBill size={18} className="text-gray-600" />
               <input
-                defaultValue={`$ ${data?.price}`}
+                defaultValue={`${data?.price}`}
                 readOnly
                 name="price"
                 placeholder="price"
@@ -108,8 +101,14 @@ export default function CheckoutForm({ data }) {
             <label className="flex items-center gap-2 bg-gray-100 p-3 rounded-lg border">
               <Database size={18} className="text-gray-600" />
               <input
+                required
                 name="date"
                 type="date"
+                defaultValue={
+                  data?.date
+                    ? new Date(data.date).toISOString().split("T")[0]
+                    : ""
+                }
                 className="input w-full bg-transparent focus:outline-none"
               />
             </label>
@@ -120,6 +119,7 @@ export default function CheckoutForm({ data }) {
             <label className="flex items-center gap-2 bg-gray-100 p-3 rounded-lg border">
               <Phone size={18} className="text-gray-600" />
               <input
+                defaultValue={data?.phone}
                 name="phone"
                 required
                 placeholder="Phone Number"
@@ -131,6 +131,7 @@ export default function CheckoutForm({ data }) {
               <MapPin size={18} className="text-gray-600" />
               <input
                 required
+                defaultValue={data?.postal}
                 name="postal"
                 placeholder="Postal Code"
                 className="input w-full bg-transparent focus:outline-none"
@@ -142,6 +143,7 @@ export default function CheckoutForm({ data }) {
           <label className="flex items-start gap-2 bg-gray-100 p-3 rounded-lg border">
             <Home size={18} className="text-gray-600 mt-1" />
             <textarea
+              defaultValue={data?.address}
               required
               name="address"
               placeholder="Street Address"
@@ -154,6 +156,7 @@ export default function CheckoutForm({ data }) {
             <label className="flex items-center gap-2 bg-gray-100 p-3 rounded-lg border">
               <MapPin size={18} className="text-gray-600" />
               <input
+                defaultValue={data?.city}
                 required
                 name="city"
                 placeholder="City"
@@ -175,6 +178,7 @@ export default function CheckoutForm({ data }) {
 
             <select
               name="delivery"
+              defaultValue={data?.delivery}
               className="select select-bordered w-full bg-gray-100"
             >
               <option>Standard Delivery</option>
@@ -194,7 +198,7 @@ export default function CheckoutForm({ data }) {
                 loading ? "loading" : ""
               }`}
             >
-              {loading ? "Processing..." : "Place Order"}
+              {loading ? "Processing..." : "Updated Order"}
             </button>
           </div>
         </form>
