@@ -26,7 +26,7 @@ const Services = async () => {
               $ {i?.price}
             </h2>
             <h2 className="card-title">{i?.title}</h2>
-            <p>{i?.description.slice(0, 200)}...</p>
+            <p>{i?.description?.slice(0, 200)}...</p>
             <div className="card-actions justify-end">
               <Link href={`/services/${i?._id}`} className="btn btn-primary">
                 <FaArrowRight />

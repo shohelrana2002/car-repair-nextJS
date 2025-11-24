@@ -1,6 +1,7 @@
 import loginUser from "@/app/actions/auth/loginUser";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
+import dbConnect, { collectionName } from "./dbConnect";
 const authOptions = {
   providers: [
     CredentialsProvider({
@@ -36,6 +37,31 @@ const authOptions = {
   ],
   pages: {
     signIn: "/login",
+  },
+  callbacks: {
+    async signIn({ user, account, profile, credentials }) {
+      if (account) {
+        const { providerAccountId, provider } = account;
+        const { email, image, name } = user;
+        const userCollection = dbConnect(collectionName.USERS);
+        const userInsert = await userCollection.findOne({ providerAccountId });
+        if (!userInsert) {
+          const payLoad = {
+            email,
+            image,
+            name,
+            providerAccountId,
+            provider,
+          };
+          await userCollection.insertOne(payLoad);
+        }
+      }
+      return true;
+    },
+
+    async jwt({ token, user, account, profile, isNewUser }) {
+      return token;
+    },
   },
 };
 

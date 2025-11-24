@@ -1,5 +1,3 @@
-import dbConnect from "@/lib/dbConnect";
-import { ObjectId } from "mongodb";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -7,8 +5,8 @@ import { FaArrowRight } from "react-icons/fa";
 
 const ServicesDetails = async ({ params }) => {
   const { id } = await params;
-  const data = await dbConnect("services").findOne({ _id: new ObjectId(id) });
-
+  const res = await fetch(`http://localhost:3000/api/services/${id}`);
+  const data = await res.json();
   return (
     <div className="container mx-auto">
       <div className="relative w-full my-12 h-[300px]">
@@ -44,7 +42,7 @@ const ServicesDetails = async ({ params }) => {
         <div className="col-span-8">
           <Image
             className="rounded-2xl"
-            src={data?.img}
+            src={data?.img || "/fallback.jpg"}
             width={802}
             height={400}
             alt={data?.title}
@@ -66,9 +64,19 @@ const ServicesDetails = async ({ params }) => {
           </div>
         </div>
         <div className="bg-blend-hue col-span-4">
+          <div className="flex justify-center flex-col w-full items-center">
+            <p className="text-2xl font-semibold">${data?.price}</p>
+            <Link
+              href={`/checkout/${data?._id}`}
+              className="btn w-full btn-success"
+            >
+              Checkout
+            </Link>
+          </div>
           <h3 className="text-xl font-extrabold my-6 text-center md:text-5xl ">
             Services
           </h3>
+
           {data?.facility?.map((i, index) => (
             <div key={index}>
               <div className="flex justify-between flex-col">
